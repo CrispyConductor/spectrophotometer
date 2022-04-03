@@ -1,19 +1,20 @@
-var pasync = require('pasync');
-var fs = require('fs');
-var Suite = require('benchmark').Suite;
-var beautify = require('beautify-benchmark');
+import pasync from 'pasync';
+import benchmark from 'benchmark';
+const { Suite } = benchmark;
+import beautify from 'beautify-benchmark';
+import { readdir } from 'fs/promises';
 
 // Queue of functions to run.
-var runQueue = [];
+let runQueue = [];
 
 // If inside of a compare block, the current suite it corresponds to
-var currentSuite = null;
+let currentSuite = null;
 
 // Stack of name components
-var nameStack = [];
+let nameStack = [];
 
 function runSuite(suite, name) {
-	return new Promise(function(resolve) {
+	return new Promise<void>(function(resolve) {
 		suite.on('cycle', function(event) {
 			beautify.add(event.target);
 		});
@@ -33,9 +34,9 @@ function runSuite(suite, name) {
 	});
 }
 
-function benchset(name, fn) {
+export function benchset(name, fn) {
 	nameStack.push(name);
-	var fullName = nameStack.join(' -> ');
+	let fullName = nameStack.join(' -> ');
 	runQueue.push(function() {
 		console.log('\n\nBenchmark set: ' + fullName + '\n');
 	});
@@ -43,9 +44,9 @@ function benchset(name, fn) {
 	nameStack.pop();
 }
 
-function compare(name, fn) {
+export function compare(name, fn) {
 	nameStack.push(name);
-	var fullName = nameStack.join(' -> ');
+	let fullName = nameStack.join(' -> ');
 	runQueue.push(function() {
 		if (currentSuite) {
 			throw new Error('Cannot nest compare blocks');
@@ -62,12 +63,12 @@ function compare(name, fn) {
 	nameStack.pop();
 }
 
-function bench(name, fn, options) {
-	var isAsync = fn.length >= 1;
+export function bench(name, fn, options = {}) {
+	let isAsync = fn.length >= 1;
 	nameStack.push(name);
-	var fullName = nameStack.join(' -> ');
+	let fullName = nameStack.join(' -> ');
 	runQueue.push(function() {
-		var isStandalone = !currentSuite;
+		let isStandalone = !currentSuite;
 		if (isStandalone) {
 			currentSuite = new Suite();
 		}
@@ -98,33 +99,25 @@ function bench(name, fn, options) {
 	nameStack.pop();
 }
 
-function run(done) {
+export function run(): Promise<void> {
 	return pasync.whilst(function() {
 		return !!runQueue.length;
 	}, function() {
-		var job = runQueue.shift();
+		let job = runQueue.shift();
 		return job();
 	}).then(function() {
 		console.log('\nBenchmarks complete.');
-		if (typeof done === 'function') {
-			done();
-		}
 	}).catch(pasync.abort);
 }
 
-function runDir(path, done) {
-	fs.readdir(path, function(err, files) {
-		files.forEach(function(file) {
-			if (file.slice(-3) === '.js' && file !== 'index.js') {
-				require(path + '/' + file);
-			}
-		});
-		run(done);
-	});
+export async function runDir(path: string): Promise<void> {
+	let files = await readdir(path);
+	for (let file of files) {
+		if (file.slice(-3) === '.js' && file !== 'index.js') {
+			await import(path + '/' + file);
+		}
+	}
+	await run();
 }
 
-exports.benchset = benchset;
-exports.compare = compare;
-exports.bench = bench;
-exports.run = run;
-exports.runDir = runDir;
+

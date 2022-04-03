@@ -1,10 +1,6 @@
-var spectrophotometer = require('../lib');
-var benchset = spectrophotometer.benchset;
-var compare = spectrophotometer.compare;
-var bench = spectrophotometer.bench;
-
-var pasync = require('pasync');
-var async = require('async');
+import { benchset, compare, bench } from '../lib/index.js';
+import pasync from 'pasync';
+import async from 'async';
 
 benchset('Array iteration', function() {
 

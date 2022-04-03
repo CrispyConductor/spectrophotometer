@@ -1,14 +1,16 @@
 {
   "name": "spectrophotometer",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "description": "Mocha-style benchmarks using benchmark.js",
-  "main": "lib/index.js",
+  "main": "dist/lib/index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zipscene/spectrophotometer"
+    "url": "https://github.com/CrispyConductor/spectrophotometer"
   },
   "keywords": [
     "benchmark",
@@ -17,21 +19,19 @@
   ],
   "author": "Chris Breneman <chris.breneman@zipscene.com>",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/zipscene/spectrophotometer/issues"
-  },
-  "homepage": "https://github.com/zipscene/spectrophotometer",
+  "homepage": "https://github.com/CrispyConductor/spectrophotometer",
   "dependencies": {
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
-    "es6-promise": "^4.2.8",
     "microtime": "^3.0.0",
-    "pasync": "^2.0.1"
-  },
-  "devDependencies": {
-    "async": "^3.2.0"
+    "pasync": "^2.0.2"
   },
   "engines": {
     "node": ">= 14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.18.12",
+    "async": "^3.2.3",
+    "typescript": "^4.6.3"
   }
 }
